@@ -1,0 +1,258 @@
+ошибки ответа
+
+    "-1":     "system not available",
+    "100002": "not supported by firmware or incorrect API path",
+    "100003": "no power",
+    "100004": "system busy",
+    "100005": "unknown error",
+    "100006": "invalid parameter",
+    "100009": "write error",
+    "103002": "unknown error",
+    "103015": "unknown error",
+    "108001": "invalid username",
+    "108002": "invalid password",
+    "108003": "user already logged in",
+    "108006": "invalid username or password",
+    "108007": "invalid username, password, or session timeout",
+    "110024": "battery charge less than 50%",
+    "111019": "no network response",
+    "111020": "network timeout",
+    "111022": "network not supported",
+    "113018": "system busy",
+    "114001": "file already exists",
+    "114002": "file already exists",
+    "114003": "SD card currently in use",
+    "114004": "path does not exist",
+    "114005": "path too long",
+    "114006": "no permission for specified file or directory",
+    "115001": "unknown error",
+    "117001": "incorrect WiFi password",
+    "117004": "incorrect WISPr password",
+    "120001": "voice busy",
+    "125001": "invalid token",
+
+
+    Information :
+
+    Connection Status :
+    URL : /api/monitoring/status
+    Request : empty
+    Respons :
+    <response>
+    <ConnectionStatus>901</ConnectionStatus> -> 902 Desconected , 901 -> Connected
+    <SignalStrength>96</SignalStrength>
+    <SignalIcon>5</SignalIcon>
+    <CurrentNetworkType>3</CurrentNetworkType>
+    <CurrentServiceDomain>3</CurrentServiceDomain>
+    <RoamingStatus>0</RoamingStatus>
+    <BatteryStatus></BatteryStatus>
+    <BatteryLevel></BatteryLevel>
+    <simlockStatus></simlockStatus>
+    <WanIPAddress>10.140.3.121</WanIPAddress>
+    <PrimaryDns>84.235.6.55</PrimaryDns>
+    <SecondaryDns>84.235.57.230</SecondaryDns>
+    <CurrentWifiUser></CurrentWifiUser>
+    <TotalWifiUser></TotalWifiUser>
+    <ServiceStatus>2</ServiceStatus>
+    <SimStatus>1</SimStatus>
+    <WifiStatus></WifiStatus>
+    </response>
+
+    Check Notifications :
+    URL : /api/monitoring/check-notifications
+    Request : empty
+    Response :
+    <response>
+    <UnreadMessage>0</UnreadMessage>
+    <SmsStorageFull>0</SmsStorageFull>
+    <OnlineUpdateStatus>10</OnlineUpdateStatus>
+    </response>
+
+    Network information :
+    URL : /api/net/current-plmn
+    Request : empty
+    Response :
+    <response>
+    <State>0</State>
+    <FullName> </FullName>
+    <ShortName> </ShortName>
+    <Numeric>42001</Numeric>
+    <Rat>0</Rat>
+
+    Device information :
+    URL : /api/device/information
+    Request : empty
+    Response :
+    <response>
+    <DeviceName>E3131</DeviceName>
+    <SerialNumber>G8J7SA1262800904</SerialNumber>
+    <Imei>862732017115150</Imei>
+    <Imsi>420013703501160</Imsi>
+    <Iccid>8996601370035011601F</Iccid>
+    <Msisdn></Msisdn>
+    <HardwareVersion>CH2E303SM</HardwareVersion>
+    <SoftwareVersion>22.157.39.00.00</SoftwareVersion>
+    <WebUIVersion>11.010.12.00.838</WebUIVersion>
+    <Uptime>5103</Uptime>
+    <MacAddress1>00:1E:10:E1:73:01</MacAddress1>
+    <MacAddress2></MacAddress2>
+    <ProductFamily>GW</ProductFamily>
+    <Classify>DataCard</Classify>
+    </response>
+
+    Operating
+    Desconnect :
+    URL : /api/dialup/dial
+    Request : <request><Action>0</Action></request>
+    OK – Response : <response>OK</response>
+
+    Connect :
+    URL : /api/dialup/dial
+    Request : <request><Action>1</Action></request>
+    OK – Response : <response>OK</response>
+    Get SMS Number :
+    URL : /api/sms/sms-count
+    Request : Empty
+    OK – Response :
+    <response>
+    <LocalUnread>0</LocalUnread>
+    <LocalInbox>0</LocalInbox>
+    <LocalOutbox>0</LocalOutbox>
+    <LocalDraft>0</LocalDraft>
+    <LocalDeleted>0</LocalDeleted>
+    <SimUnread>0</SimUnread>
+    <SimInbox>0</SimInbox>
+    <SimOutbox>0</SimOutbox>
+    <SimDraft>0</SimDraft>
+    <LocalMax>500</LocalMax>
+    <SimMax>100</SimMax>
+    </response>
+
+    Recive SMS Inbox :
+    URL : /api/sms/sms-list
+    Header : Referer = … /html/smsinbox.html?smsinbox
+    Request :
+    <request>
+    <PageIndex>1</PageIndex>
+    <ReadCount>20</ReadCount>
+    <BoxType>1</BoxType> -> 1 Full details
+    <SortType>0</SortType>
+    <Ascending>0</Ascending>
+    <UnreadPreferred>0</UnreadPreferred>
+    </request>
+    OK- Response:
+    Box Type 1 :
+    <response>
+    <Count>1</Count>
+    <Messages>
+    <Message>
+    <Smstat>0</Smstat>
+    <Index>20000</Index>
+    <Phone> ######## </Phone>
+    <Content>Message content here </Content>
+    <Date>2012-08-13 20:54:42</Date>
+    <Sca>########</Sca>
+    <SaveType>4</SaveType>
+    <Priority>0</Priority>
+    <SmsType>1</SmsType>
+    </Message>
+    </Messages>
+    </response>
+
+    IF THE PAGE NUMBER DOSE’T EXIST THE RESPONSE WILL BE
+    <response>
+    <Count>0</Count>
+    <Messages></Messages>
+    </response>
+
+    Set SMS AS READED :
+    URL : /api/sms/send-sms
+    Request : <request><Index>20000</Index></request>
+    OK – Response : <response>OK</response>
+
+    Send SMS :
+    URL : /api/sms/send-sms
+    Request :
+    <request>
+    <Index>-1</Index> -> -1 if its not a replay to any index
+    <Phones><Phone>+23428479287</Phone></Phones>
+    <Sca></Sca>
+    <Content>HELLO</Content>
+    <Length>29</Length>
+    <Reserved>1</Reserved>
+    <Date>2012-08-13 23:25:07</Date>
+    </request>
+    Response :
+    <response>OK</response>
+
+    Send USSD :
+    URL :
+    REQUEST : <request><content>*333#</content><codeType>CodeType</codeType></request>
+
+    RESPONSE : <response>OK</response>
+
+    Get OUTBOX SMS List :
+    URL : /api/sms/sms-list
+    HEADER : Referer = … /html/smsinbox.html?smssent
+    Request :
+    <request>
+    <PageIndex>1</PageIndex>
+    <ReadCount>20</ReadCount>
+    <BoxType>2</BoxType>
+    <SortType>0</SortType>
+    <Ascending>0</Ascending>
+    <UnreadPreferred>0</UnreadPreferred>
+    </request>
+    Response :
+    <response>
+    <Count>4</Count>
+    <Messages>
+    <Message>
+    <Smstat>3</Smstat>
+    <Index>20001</Index>
+    <Phone>########## </Phone>
+    <Content> asdfasdfasdf </Content>
+    <Date>2012-08-13 23:25:07</Date>
+    <Sca>+966505031999</Sca>
+    <SaveType>3</SaveType>
+    <Priority>4</Priority>
+    <SmsType>1</SmsType>
+    </Message>
+    ….
+    </Messages>
+
+    Managment :
+
+    Auto Connect Settings :
+    URL : /api/dialup/connection
+    Header : Referer: … /html/autoconnection.html
+    Request :
+    <request>
+    <RoamAutoConnectEnable>0</RoamAutoConnectEnable>
+    <AutoReconnect>1</AutoReconnect>
+    <RoamAutoReconnctEnable>1</RoamAutoReconnctEnable>
+    <ReconnectInterval>3</ReconnectInterval>
+    <MaxIdelTime>0</MaxIdelTime>
+    <ConnectMode>0</ConnectMode>
+    </request>
+    RESPONSE :
+    <response>OK</response>
+
+    Pin Operations :
+    URL : /api/pin/operate
+    Header : Referer: http://hi.link/html/pincodemanagement.html
+    OperationType = 1 Enable Pin
+    OperationType = 2 Disable Pin
+    OperationType = 3 New Pin
+
+    Example of OP3 :
+    Request :
+    <request>
+    <OperateType>3</OperateType>
+    <CurrentPin>6132</CurrentPin>
+    <NewPin>6132</NewPin>
+    <PukCode></PukCode>
+    </request>
+
+    Response :
+    <response>OK</response>

@@ -1,0 +1,28 @@
+{
+  "name": "hilinkhuawei",
+  "version": "0.1.1",
+  "description": "Client for modems with firmware HiLink",
+  "main": "index.js",
+  "keywords": [
+    "hilink",
+    "huawei",
+    "sms",
+    "E3372",
+    "827F",
+	"modem"
+  ],
+  "homepage": "https://github.com/bondrogeen/hilinkhuawei",
+  "directories": {
+    "bin": "./bin/hilink"
+  },
+  "dependencies": {
+    "xmlbuilder": "~2.1.0",
+    "dateformat": "~1.0.7-1.2.3",
+    "xml2js": "~0.4.17"
+  },
+  "author": {
+    "name": "bondrogeen",
+	"email": "bondrogeen@gmail.com"
+  },
+  "license": "MIT"
+}
