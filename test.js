@@ -1,3 +1,5 @@
 var hilink = require('hilinkhuawei');
 
-hilink.send( '12345678', 'Hello world', function( response ){ console.log( response ); });
+hilink.ussd( '*100#', function( response ){
+    console.log(JSON.stringify(response) );
+});

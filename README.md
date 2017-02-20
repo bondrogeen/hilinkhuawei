@@ -16,10 +16,21 @@ E3372 (МТС 827F/829F, МегаФон M150-2, Билайн E3372/E3370, TELE2 
 
 	hilink.setIp('192.168.8.x')
 
+* Отправка ussd ( *100#, callback )
+
+    hilink.ussd( '*100#', function( response ){
+        console.log(JSON.stringify(response) );
+    });
+
+* Ответ: *
+
+	{ response: 'OK' }
+
+
 * Отправка SMS ( number, text, callback )
 
 	hilink.send( '12345678', 'Hello world', function( response ){
-		console.log( response );
+		console.log( JSON.stringify( response, null, 2 ) );
 	});
 	
 * Ответ: *
@@ -29,8 +40,8 @@ E3372 (МТС 827F/829F, МегаФон M150-2, Билайн E3372/E3370, TELE2 
 * Отправка без сохранения  SMS ( number, text, callback )
 
 	hilink.sendAndDelete( '12345678', 'Hello world', function( sendResponse, deleteResponse ){
-		console.log( sendResponse );
-		console.log( deleteResponse );
+		console.log( JSON.stringify(sendResponse) );
+		console.log( JSON.stringify(deleteResponse) );
 	});
 	
 * Ответ: *
@@ -531,4 +542,10 @@ E3372 (МТС 827F/829F, МегаФон M150-2, Билайн E3372/E3370, TELE2 
     ]
   }
 }
+   Changelog
+      
+   0.1.2 -  добавил ussd команды
+   
+   0.1.1 
 
+    

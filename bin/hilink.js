@@ -339,6 +339,29 @@ var hilink = function(){
         });
     }
 
+
+    self.ussd = function( number, callback ){
+        var xml = builder.create({
+            request: {
+
+                content: {
+                    '#text': number
+                },
+                codeType: {
+                    '#text' : 'CodeType'
+                },
+
+            }
+        }).end({ pretty: true});
+
+        self.request( '/api/ussd/send', xml, function( response ){
+            callback( response );
+        });
+
+    }
+
+
+
 }
 
 module.exports =  new hilink();
