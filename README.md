@@ -15,6 +15,13 @@ E3372 (МТС 827F/829F, МегаФон M150-2, Билайн E3372/E3370, TELE2 
 * Изменить IP адрес (default 192.168.8.1)
 
 	hilink.setIp('192.168.8.x')
+	
+* Изменить отображение статистики трафика  (default - 'auto')
+    
+    'auto' - автоматическое отображение в B, KB, MB, GB, TB и времени в 00:00:10 
+    'def'  - по умолчанию трафик в битах, время в сек.
+    
+    hilink.setTrafficInfo('def')
 
 * Отправка ussd ( *100#, callback )
 
@@ -24,7 +31,10 @@ E3372 (МТС 827F/829F, МегаФон M150-2, Билайн E3372/E3370, TELE2 
 
 * Ответ: *
 
-	{ response: 'OK' }
+	{"response":{
+	"content":["Баланс:88,19р,Лимит:0,01р "],
+	"response":"OK"	}
+	}
 
 
 * Отправка SMS ( number, text, callback )
@@ -49,37 +59,17 @@ E3372 (МТС 827F/829F, МегаФон M150-2, Билайн E3372/E3370, TELE2 
 	{ response: 'OK' }
 	{ response: 'OK' }
 
-* Отключиться от сети (callback)
+* Подключиться к сети ('conect',callback)
+* Отключиться от сети ('desconect',callback)
+* Перезагрузка модема ('reboot',callback)
 
-    	hilink.desconnect(function( response ){
-            console.log( JSON.stringify( response, null, 2 ) );
-        });
-
-* Ответ: *
-
-{  response: 'OK'  }
-
-* Подключиться к сети (callback)
-
-    	hilink.connect(function( response ){
-            console.log( JSON.stringify( response, null, 2 ) );
-        });
+hilink.control('conect',function(response ){
+    console.log( JSON.stringify( response, null, 2 ) );
+});
 
 * Ответ: *
 
 {  response: 'OK'  }
-
-* Перезагрузка модема (callback)
-
-    	hilink.reboot(function( response ){
-            console.log( JSON.stringify( response, null, 2 ) );
-        });
-
-* Ответ: *
-
-{  response: 'OK'  }
-
-
 
 
 * Список исходящих сообщений (callback)
@@ -100,10 +90,10 @@ E3372 (МТС 827F/829F, МегаФон M150-2, Билайн E3372/E3370, TELE2 
             'Message': [
               {
                 'Smstat': [
-                  '3'
+                  '0'
                 ],
                 'Index': [
-                  '20000'
+                  '40000'
                 ],
                 'Phone': [
                   '12345678'
@@ -118,10 +108,10 @@ E3372 (МТС 827F/829F, МегаФон M150-2, Билайн E3372/E3370, TELE2 
                   ''
                 ],
                 'SaveType': [
-                  '3'
+                  '4'
                 ],
                 'Priority': [
-                  '4'
+                  '0'
                 ],
                 'SmsType': [
                   '1'
@@ -163,7 +153,7 @@ E3372 (МТС 827F/829F, МегаФон M150-2, Билайн E3372/E3370, TELE2 
                   'Hello  bondrogeen'
                 ],
                 'Date': [
-                  '2014-03-03 17:49:16'
+                  '2017-04-03 09:01:54'
                 ],
                 'Sca': [
                   ''
@@ -183,6 +173,108 @@ E3372 (МТС 827F/829F, МегаФон M150-2, Билайн E3372/E3370, TELE2 
         ]
       }
     }
+ 
+    
+Список только новых входящих сообщений (callback)    
+    
+    hilink.listNew(function(response ){
+        console.log( JSON.stringify( response, null, 2 ) );
+    });
+
+
+* Ответ: *    
+    
+    [
+      {
+        "response": "OK"
+      },
+      {
+        "Smstat": [
+          "0"
+        ],
+        "Index": [
+          "40023"
+        ],
+        "Phone": [
+          "+7123456789"
+        ],
+        "Content": [
+          "test"
+        ],
+        "Date": [
+          "2017-02-24 00:14:55"
+        ],
+        "Sca": [
+          ""
+        ],
+        "SaveType": [
+          "4"
+        ],
+        "Priority": [
+          "0"
+        ],
+        "SmsType": [
+          "1"
+        ]
+      },
+      {
+        "Smstat": [
+          "0"
+        ],
+        "Index": [
+          "40022"
+        ],
+        "Phone": [
+          "+7123456789"
+        ],
+        "Content": [
+          "тест"
+        ],
+        "Date": [
+          "2017-02-24 00:14:28"
+        ],
+        "Sca": [
+          ""
+        ],
+        "SaveType": [
+          "4"
+        ],
+        "Priority": [
+          "0"
+        ],
+        "SmsType": [
+          "1"
+        ]
+      }
+    ]
+  
+    
+* Пометить как прочитаное сообщение   (index,callback)
+    
+    hilink.setRead('40001',function(response ){
+        console.log( JSON.stringify( response, null, 2 ) );
+    });
+    
+* Ответ: *
+ 
+ {  response: 'OK'  }
+ 
+* Пометить все сообщения как прочитаные
+
+    hilink.readAll(function(response ){
+        console.log( JSON.stringify( response, null, 2 ) );
+    });
+ 
+* Ответ: *
+ 
+[
+  {
+    "response": "OK"
+  },
+  "40021", // индекс отмеченного как прочитанное сообщения 
+  "40020"
+]
+   
     
 * Очистка входящих сообщений
 
@@ -191,6 +283,17 @@ E3372 (МТС 827F/829F, МегаФон M150-2, Билайн E3372/E3370, TELE2 
 * Очистка исходящих сообщений
 
 	hilink.clearOutbox();
+
+* Удаление сообщения по индексу 
+
+    hilink.delete( '40007', function( response ){
+        console.log(JSON.stringify(response) );
+    });
+
+* Ответ: *
+
+{  response: 'OK'  }
+
 
 * Статус (callback)
 
@@ -203,7 +306,7 @@ E3372 (МТС 827F/829F, МегаФон M150-2, Билайн E3372/E3370, TELE2 
 	{
       'response': {
         'ConnectionStatus': [
-          '901'
+          'CONNECTED'
         ],
         'WifiConnectionStatus': [
           ''
@@ -215,7 +318,7 @@ E3372 (МТС 827F/829F, МегаФон M150-2, Билайн E3372/E3370, TELE2 
           '3'
         ],
         'CurrentNetworkType': [
-          '101'
+          'LTE'
         ],
         'CurrentServiceDomain': [
           '3'
@@ -242,10 +345,10 @@ E3372 (МТС 827F/829F, МегаФон M150-2, Билайн E3372/E3370, TELE2 
           ''
         ],
         'PrimaryDns': [
-          '217.74.244.5'
+          '111.222.333.5'
         ],
         'SecondaryDns': [
-          '217.74.244.4'
+          '111.222.333.4'
         ],
         'PrimaryIPv6Dns': [
           ''
@@ -318,7 +421,7 @@ E3372 (МТС 827F/829F, МегаФон M150-2, Билайн E3372/E3370, TELE2 
   }
 }
 
-* Статус сети (callback)
+* Статус оператора сети (callback)
 
     	hilink.statusNet(function( response ){
             console.log( JSON.stringify( response, null, 2 ) );
@@ -415,7 +518,7 @@ E3372 (МТС 827F/829F, МегаФон M150-2, Билайн E3372/E3370, TELE2 
       ''
     ],
     'cell_id': [
-      '141706539'
+      '123456789'
     ],
     'rsrq': [
       '-7dB'
@@ -481,9 +584,9 @@ E3372 (МТС 827F/829F, МегаФон M150-2, Билайн E3372/E3370, TELE2 
   }
 }
 
-* Тип сети (callback)
+* Информация о модеме (callback)
 
-    	hilink.Net(function( response ){
+    	hilink.basicInfo(function( response ){
             console.log( JSON.stringify( response, null, 2 ) );
         });
 
@@ -503,7 +606,7 @@ E3372 (МТС 827F/829F, МегаФон M150-2, Билайн E3372/E3370, TELE2 
   }
 }
 
-* Статистика подключения (callback)
+* Статистика трафика (callback)
 
     	hilink.traffic(function( response ){
             console.log( JSON.stringify( response, null, 2 ) );
@@ -542,9 +645,45 @@ E3372 (МТС 827F/829F, МегаФон M150-2, Билайн E3372/E3370, TELE2 
     ]
   }
 }
+
+* Статистика трафика за месяц (callback)
+
+
+    	hilink.trafficMonth (function( response ) {
+            console.log( JSON.stringify( response) );
+        });
+
+
+* Ответ: *
+
+{"response":
+{"CurrentMonthDownload":["229.06 MB"],
+"CurrentMonthUpload":["4.17 MB"],
+"MonthDuration":["01:18:40"],
+"MonthLastClearTime":["2017-2-21"]}
+}
+
+
    Changelog
-      
-   0.1.2 -  добавил ussd команды
+   
+   1.1.1
+   
+Добавил новые функции
+   
+   1.0.0 
+   
+Изменения запросов пакету  
+   
+   0.2.1 
+   
+Добавил  статистику трафика за месяц, изменил отображение статистики трафика, статус подключения и отображения типа сети. 
+Добавил ответ от оператора от USSD запроса. 
+Удаление по индексу сообщения.
+			
+			
+   0.1.2 
+   
+   Добавил ussd команды
    
    0.1.1 
 
