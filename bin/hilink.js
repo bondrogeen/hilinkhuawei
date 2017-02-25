@@ -227,7 +227,7 @@ var hilink = function(){
 
     self.listInbox = function(callback){
         self.list( 1,function( response ){
-
+            callback(response);
         });
     }
 
