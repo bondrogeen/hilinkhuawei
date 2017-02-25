@@ -80,48 +80,34 @@ hilink.control('conect',function(response ){
 	
 * Ответ: *
 
-    {
-      'response': {
-        'Count': [
-          '1'
-        ],
-        'Messages': [
-          {
-            'Message': [
-              {
-                'Smstat': [
-                  '0'
-                ],
-                'Index': [
-                  '40000'
-                ],
-                'Phone': [
-                  '12345678'
-                ],
-                'Content': [
-                  'Hello world'
-                ],
-                'Date': [
-                  '2017-04-03 09:01:54'
-                ],
-                'Sca': [
-                  ''
-                ],
-                'SaveType': [
-                  '4'
-                ],
-                'Priority': [
-                  '0'
-                ],
-                'SmsType': [
-                  '1'
-                ]
-              }
-            ]
-          }
-        ]
-      }
-    }
+   {
+     "response": [
+       {
+         "Smstat": "3",
+         "Index": "40007",
+         "Phone": "123456789",
+         "Content": "4454545454",
+         "Date": "2017-02-25 20:36:30",
+         "Sca": "",
+         "SaveType": "3",
+         "Priority": "4",
+         "SmsType": "1"
+       },
+       {
+         "Smstat": "3",
+         "Index": "40003",
+         "Phone": "123456789",
+         "Content": "121213",
+         "Date": "2017-02-23 14:21:29",
+         "Sca": "",
+         "SaveType": "3",
+         "Priority": "4",
+         "SmsType": "1"
+       }
+     ],
+     "Count": "2"
+   }
+
     
 * Список входящих сообщений (callback)
 
@@ -131,48 +117,34 @@ hilink.control('conect',function(response ){
 	
 * Ответ: *
 
+{
+  "response": [
     {
-      'response': {
-        'Count': [
-          '1'
-        ],
-        'Messages': [
-          {
-            'Message': [
-              {
-                'Smstat': [
-                  '0'
-                ],
-                'Index': [
-                  '40001'
-                ],
-                'Phone': [
-                  '+71234567898'
-                ],
-                'Content': [
-                  'Hello  bondrogeen'
-                ],
-                'Date': [
-                  '2017-04-03 09:01:54'
-                ],
-                'Sca': [
-                  ''
-                ],
-                'SaveType': [
-                  '4'
-                ],
-                'Priority': [
-                  '0'
-                ],
-                'SmsType': [
-                  '1'
-                ]
-              }
-            ]
-          }
-        ]
-      }
+      "Smstat": "0",
+      "Index": "40012",
+      "Phone": "+123456789",
+      "Content": "test",
+      "Date": "2017-02-25 21:04:45",
+      "Sca": "",
+      "SaveType": "4",
+      "Priority": "0",
+      "SmsType": "1"
+    },
+    {
+      "Smstat": "1",
+      "Index": "40001",
+      "Phone": "Balance",
+      "Content": "Баланс:62,39р,Лимит:0,01р",
+      "Date": "2017-02-23 14:20:52",
+      "Sca": "",
+      "SaveType": "4",
+      "Priority": "0",
+      "SmsType": "2"
     }
+  ],
+  "Count": "2"
+}
+    
  
     
 Список только новых входящих сообщений (callback)    
@@ -184,70 +156,44 @@ hilink.control('conect',function(response ){
 
 * Ответ: *    
     
-    [
-      {
-        "response": "OK"
-      },
-      {
-        "Smstat": [
-          "0"
-        ],
-        "Index": [
-          "40023"
-        ],
-        "Phone": [
-          "+7123456789"
-        ],
-        "Content": [
-          "test"
-        ],
-        "Date": [
-          "2017-02-24 00:14:55"
-        ],
-        "Sca": [
-          ""
-        ],
-        "SaveType": [
-          "4"
-        ],
-        "Priority": [
-          "0"
-        ],
-        "SmsType": [
-          "1"
-        ]
-      },
-      {
-        "Smstat": [
-          "0"
-        ],
-        "Index": [
-          "40022"
-        ],
-        "Phone": [
-          "+7123456789"
-        ],
-        "Content": [
-          "тест"
-        ],
-        "Date": [
-          "2017-02-24 00:14:28"
-        ],
-        "Sca": [
-          ""
-        ],
-        "SaveType": [
-          "4"
-        ],
-        "Priority": [
-          "0"
-        ],
-        "SmsType": [
-          "1"
-        ]
-      }
-    ]
-  
+{
+  "response": [
+    {
+      "Smstat": "0",
+      "Index": "40010",
+      "Phone": "+123456789",
+      "Content": "test text",
+      "Date": "2017-02-25 20:37:53",
+      "Sca": "",
+      "SaveType": "4",
+      "Priority": "0",
+      "SmsType": "1"
+    },
+    {
+      "Smstat": "0",
+      "Index": "40009",
+      "Phone": "+123456789",
+      "Content": "test text",
+      "Date": "2017-02-25 20:37:50",
+      "Sca": "",
+      "SaveType": "4",
+      "Priority": "0",
+      "SmsType": "1"
+    },
+    {
+      "Smstat": "0",
+      "Index": "40008",
+      "Phone": "+123456789",
+      "Content": "test new sms",
+      "Date": "2017-02-25 20:37:47",
+      "Sca": "",
+      "SaveType": "4",
+      "Priority": "0",
+      "SmsType": "1"
+    }
+  ],
+  "Count": 3
+}
     
 * Пометить как прочитаное сообщение   (index,callback)
     
@@ -267,13 +213,14 @@ hilink.control('conect',function(response ){
  
 * Ответ: *
  
-[
-  {
-    "response": "OK"
-  },
-  "40021", // индекс отмеченного как прочитанное сообщения 
-  "40020"
-]
+{
+  "response": [
+    "40022",
+    "40006",
+    "40004"
+  ],
+  "Count": 3
+}
    
     
 * Очистка входящих сообщений
@@ -304,99 +251,28 @@ hilink.control('conect',function(response ){
 * Ответ: *
 
 	{
-      'response': {
-        'ConnectionStatus': [
-          'CONNECTED'
-        ],
-        'WifiConnectionStatus': [
-          ''
-        ],
-        'SignalStrength': [
-          ''
-        ],
-        'SignalIcon': [
-          '3'
-        ],
-        'CurrentNetworkType': [
-          'LTE'
-        ],
-        'CurrentServiceDomain': [
-          '3'
-        ],
-        'RoamingStatus': [
-          '0'
-        ],
-        'BatteryStatus': [
-          ''
-        ],
-        'BatteryLevel': [
-          ''
-        ],
-        'BatteryPercent': [
-          ''
-        ],
-        'simlockStatus': [
-          '0'
-        ],
-        'WanIPAddress': [
-          '10.10.10.10'
-        ],
-        'WanIPv6Address': [
-          ''
-        ],
-        'PrimaryDns': [
-          '111.222.333.5'
-        ],
-        'SecondaryDns': [
-          '111.222.333.4'
-        ],
-        'PrimaryIPv6Dns': [
-          ''
-        ],
-        'SecondaryIPv6Dns': [
-          ''
-        ],
-        'CurrentWifiUser': [
-          ''
-        ],
-        'TotalWifiUser': [
-          ''
-        ],
-        'currenttotalwifiuser': [
-          '0'
-        ],
-        'ServiceStatus': [
-          '2'
-        ],
-        'SimStatus': [
-          '1'
-        ],
-        'WifiStatus': [
-          ''
-        ],
-        'CurrentNetworkTypeEx': [
-          '101'
-        ],
-        'maxsignal': [
-          '5'
-        ],
-        'wifiindooronly': [
-          '-1'
-        ],
-        'wififrequence': [
-          '0'
-        ],
-        'msisdn': [
-          ''
-        ],
-        'classify': [
-          'hilink'
-        ],
-        'flymode': [
-          '0'
-        ]
+      "response": {
+        "ConnectionStatus": "CONNECTED",
+        "SignalIcon": "3",
+        "CurrentNetworkType": "LTE",
+        "CurrentServiceDomain": "3",
+        "RoamingStatus": "0",
+        "simlockStatus": "0",
+        "WanIPAddress": "123.123.123.123",
+        "PrimaryDns": "11.11.24.4",
+        "SecondaryDns": "11.11.114.15",
+        "currenttotalwifiuser": "0",
+        "ServiceStatus": "2",
+        "SimStatus": "1",
+        "CurrentNetworkTypeEx": "101",
+        "maxsignal": "5",
+        "wifiindooronly": "-1",
+        "wififrequence": "0",
+        "classify": "hilink",
+        "flymode": "0"
       }
     }
+
 
 
 * Уведомление (callback)
@@ -408,16 +284,10 @@ hilink.control('conect',function(response ){
 * Ответ: *
 
 {
-  'response': {
-    'UnreadMessage': [
-      '0'
-    ],
-    'SmsStorageFull': [
-      '0'
-    ],
-    'OnlineUpdateStatus': [
-      '10'
-    ]
+  "response": {
+    "UnreadMessage": "0",
+    "SmsStorageFull": "0",
+    "OnlineUpdateStatus": "10"
   }
 }
 
@@ -430,22 +300,12 @@ hilink.control('conect',function(response ){
 * Ответ: *
 
 {
-  'response': {
-    'State': [
-      '0'
-    ],
-    'FullName': [
-      'MTS-RUS'
-    ],
-    'ShortName': [
-      'MTS'
-    ],
-    'Numeric': [
-      '25001'
-    ],
-    'Rat': [
-      '7'
-    ]
+  "response": {
+    "State": "0",
+    "FullName": "MTS-RUS",
+    "ShortName": "MTS",
+    "Numeric": "25001",
+    "Rat": "7"
   }
 }
 
@@ -458,46 +318,20 @@ hilink.control('conect',function(response ){
 * Ответ: *
 
 {
-  'response': {
-    'LocalUnread': [
-      '0'
-    ],
-    'LocalInbox': [
-      '1'
-    ],
-    'LocalOutbox': [
-      '2'
-    ],
-    'LocalDraft': [
-      '0'
-    ],
-    'LocalDeleted': [
-      '0'
-    ],
-    'SimUnread': [
-      '0'
-    ],
-    'SimInbox': [
-      '1'
-    ],
-    'SimOutbox': [
-      '0'
-    ],
-    'SimDraft': [
-      '0'
-    ],
-    'LocalMax': [
-      '500'
-    ],
-    'SimMax': [
-      '5'
-    ],
-    'SimUsed': [
-      '1'
-    ],
-    'NewMsg': [
-      '0'
-    ]
+  "response": {
+    "LocalUnread": "0",
+    "LocalInbox": "3",
+    "LocalOutbox": "1",
+    "LocalDraft": "2",
+    "LocalDeleted": "0",
+    "SimUnread": "0",
+    "SimInbox": "1",
+    "SimOutbox": "0",
+    "SimDraft": "0",
+    "LocalMax": "500",
+    "SimMax": "5",
+    "SimUsed": "1",
+    "NewMsg": "0"
   }
 }
 
@@ -510,37 +344,14 @@ hilink.control('conect',function(response ){
 * Ответ: *
 
 {
-  'response': {
-    'pci': [
-      '460'
-    ],
-    'sc': [
-      ''
-    ],
-    'cell_id': [
-      '123456789'
-    ],
-    'rsrq': [
-      '-7dB'
-    ],
-    'rsrp': [
-      '-96dBm'
-    ],
-    'rssi': [
-      '-83dBm'
-    ],
-    'sinr': [
-      '9dB'
-    ],
-    'rscp': [
-      ''
-    ],
-    'ecio': [
-      ''
-    ],
-    'mode': [
-      '7'
-    ]
+  "response": {
+    "pci": "123",
+    "cell_id": "123456789",
+    "rsrq": "-7dB",
+    "rsrp": "-97dBm",
+    "rssi": "-81dBm",
+    "sinr": "8dB",
+    "mode": "7"
   }
 }
 
@@ -553,34 +364,16 @@ hilink.control('conect',function(response ){
 * Ответ: *
 
 {
-  'response': {
-    'DhcpIPAddress': [
-      '192.168.8.1'
-    ],
-    'DhcpLanNetmask': [
-      '255.255.255.0'
-    ],
-    'DhcpStatus': [
-      '1'
-    ],
-    'DhcpStartIPAddress': [
-      '192.168.8.100'
-    ],
-    'DhcpEndIPAddress': [
-      '192.168.8.200'
-    ],
-    'DhcpLeaseTime': [
-      '86400'
-    ],
-    'DnsStatus': [
-      '1'
-    ],
-    'PrimaryDns': [
-      '192.168.8.1'
-    ],
-    'SecondaryDns': [
-      '192.168.8.1'
-    ]
+  "response": {
+    "DhcpIPAddress": "192.168.8.1",
+    "DhcpLanNetmask": "255.255.255.0",
+    "DhcpStatus": "1",
+    "DhcpStartIPAddress": "192.168.8.100",
+    "DhcpEndIPAddress": "192.168.8.200",
+    "DhcpLeaseTime": "86400",
+    "DnsStatus": "1",
+    "PrimaryDns": "192.168.8.1",
+    "SecondaryDns": "192.168.8.1"
   }
 }
 
@@ -593,16 +386,10 @@ hilink.control('conect',function(response ){
 * Ответ: *
 
 {
-  'response': {
-    'productfamily': [
-      'LTE'
-    ],
-    'classify': [
-      'hilink'
-    ],
-    'multimode': [
-      '0'
-    ]
+  "response": {
+    "productfamily": "LTE",
+    "classify": "hilink",
+    "multimode": "0"
   }
 }
 
@@ -615,34 +402,16 @@ hilink.control('conect',function(response ){
 * Ответ: *
 
 {
-  'response': {
-    'CurrentConnectTime': [
-      '3644'
-    ],
-    'CurrentUpload': [
-      '3743812'
-    ],
-    'CurrentDownload': [
-      '192565694'
-    ],
-    'CurrentDownloadRate': [
-      '1828953'
-    ],
-    'CurrentUploadRate': [
-      '18653'
-    ],
-    'TotalUpload': [
-      '16200230379'
-    ],
-    'TotalDownload': [
-      '386548284594'
-    ],
-    'TotalConnectTime': [
-      '8895223'
-    ],
-    'showtraffic': [
-      '1'
-    ]
+  "response": {
+    "CurrentConnectTime": "00:25:46",
+    "CurrentUpload": "1.41 MB",
+    "CurrentDownload": "75.87 MB",
+    "CurrentDownloadRate": "5.35 KB",
+    "CurrentUploadRate": "717 B",
+    "TotalUpload": "455.63 MB",
+    "TotalDownload": "14.66 GB",
+    "TotalConnectTime": "94:34:16",
+    "showtraffic": "1"
   }
 }
 
@@ -656,15 +425,21 @@ hilink.control('conect',function(response ){
 
 * Ответ: *
 
-{"response":
-{"CurrentMonthDownload":["229.06 MB"],
-"CurrentMonthUpload":["4.17 MB"],
-"MonthDuration":["01:18:40"],
-"MonthLastClearTime":["2017-2-21"]}
+{
+  "response": {
+    "CurrentMonthDownload": "14.67 GB",
+    "CurrentMonthUpload": "455.74 MB",
+    "MonthDuration": "94:35:40",
+    "MonthLastClearTime": "2017-2-21"
+  }
 }
 
 
    Changelog
+   
+   2.0.0
+   
+Изменил ответ
    
    1.1.1
    

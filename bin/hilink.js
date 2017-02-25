@@ -13,14 +13,14 @@ var hilink = function(){
     self.ip = '192.168.8.1';
 
 //ip def.
-    self.trafficInfo = 'auto'
+    self.trafficInfo = 'auto';
 
     self.token = '0000';
 
 
     self.setTrafficInfo = function (TrafficInfo) {
         self.trafficInfo = TrafficInfo;
-    }
+    };
 
 //изменения ip
     self.setIp = function( ip ){
@@ -121,7 +121,7 @@ var hilink = function(){
             callback( response );
         });
 
-    }
+    };
 
     self.setRead = function (index, callback) {
         var xml = builder.create({
@@ -136,42 +136,29 @@ var hilink = function(){
         self.request('/api/sms/set-read', xml, function (response) {
             callback(response);
         });
-    }
+    };
 
     self.readAll = function (callback) {
         self.list(1, function (results) {
-            response = []
-            var k = 0
+            var response = {};
+            var key = 0;
+            var index = [];
             for (i = 0; i < results.response.Count[0]; i++) {
                 if (results.response.Messages[0].Message[i].Smstat[0] == 0) {
                     self.setRead(results.response.Messages[0].Message[i].Index[0], function (res) {
                     });
-                    k = k + 1
-                    response[k] = results.response.Messages[0].Message[i].Index[0]
-
+                    index[key] = results.response.Messages[0].Message[i].Index[0];
+                    response.response = index
+                    key = key + 1;
+                    response.Count = key
                 }
+                ;
             }
 
-            if (response.length == 0) {
-                response[0] = {"response": "no_new_sms"};
-            } else {
-                response[0] = {"response": "OK"};
+            if (index.length == 0) {
+                response = {"response": "no_new_sms"};
             }
-
             callback(response);
-            /*
-             results["response"]["Messages"][0]["Message"].forEach(function (message) {
-             if (message.Smstat == 0) {
-             self.setRead(message.Index[0], function (response) {
-             response.index =  message.Index[0];
-             //callback( response );
-             });
-             }
-             })
-
-             */
-
-
         });
     };
 
@@ -208,32 +195,51 @@ var hilink = function(){
 
 
     self.listNew = function (callback) {
-        self.list(1, function (results) {
-            response = []
-            for (i = 0; i < results.response.Count[0]; i++) {
-                if (results.response.Messages[0].Message[i].Smstat[0] == 0) {
-                    response[i + 1] = results.response.Messages[0].Message[i];
+        self.list(1, function (response) {
+            response = listfilter(response);
+            var k = 0;
+            var Messages = [];
+            for (var i = 0; i < response.Count; i++) {
+                if (response.response[i].Smstat == 0) {
+                    Messages[k] = response.response[i];
+                    k = k + 1;
                 }
             }
-
-            if (response.length == 0) {
-                response[0] = {"response": "no_new_sms"};
-            } else {
-                response[0] = {"response": "OK"};
+            response.response = Messages
+            response.Count = k
+            if (Messages.length == 0) {
+                response = {"response": "no_new_sms"};
             }
             callback(response);
         });
     }
 
+    function listfilter(response) {
+
+        Count = response.response.Count[0];
+        response.response = response.response.Messages[0].Message
+        for (var i = 0; i < Count; i++) {
+            for (var key in response.response[i]) {
+                x = response.response[i][key][0];
+                response.response[i][key] = x;
+            }
+        }
+        response.Count = Count;
+        //console.log(response);
+        return response;
+
+    };
+
+
     self.listInbox = function(callback){
         self.list( 1,function( response ){
-            callback(response);
+            callback(listfilter(response));
         });
     }
 
     self.listOutbox = function(callback){
         self.list( 2,function( response ){
-            callback(response);
+            callback(listfilter(response));
         });
     }
 
@@ -251,6 +257,7 @@ var hilink = function(){
             callback( response );
         });
     }
+
 
 
     self.deleteAll = function(type){
@@ -343,28 +350,27 @@ var hilink = function(){
         "64": "TD_HSPA",
         "65": "TD_HSPA_PLUS",
         "81": "802.16E",
-        "101": "LTE",
-    }
+        "101": "LTE"
+    };
     self.jsonNetStatsu = {
         "900": "CONNECTING",
         "901": "CONNECTED",
         "902": "DISCONNECTING",
-        "904": "DISCONNECTED",
-    }
+        "904": "DISCONNECTED"
+    };
 
 
 // информация общая о модеме
 
     self.status = function(callback){
         self.info('/api/monitoring/status', function (response) {
-
             self.jsonNet[response.response.CurrentNetworkType[0]] = self.jsonNet[response.response.CurrentNetworkType[0]] || response.response.CurrentNetworkType[0]
             response.response.CurrentNetworkType[0] = self.jsonNet[response.response.CurrentNetworkType[0]]
-
             self.jsonNetStatsu[response.response.ConnectionStatus[0]] = self.jsonNetStatsu[response.response.ConnectionStatus[0]] || response.response.ConnectionStatus[0]
             response.response.ConnectionStatus[0] = self.jsonNetStatsu[response.response.ConnectionStatus[0]]
-
-            callback(response);
+            self.jsonNet[response.response.CurrentNetworkTypeEx[0]] = self.jsonNet[response.response.CurrentNetworkTypeEx[0]] || response.response.CurrentNetworkTypeEx[0]
+            response.response.CurrentNetworkTypeEx[0] = self.jsonNet[response.response.CurrentNetworkTypeEx[0]]
+            callback(filter(response));
         });
 
     }
@@ -372,42 +378,42 @@ var hilink = function(){
 // информация о уведомлениях  сети
     self.notifications = function(callback){
         self.info( '/api/monitoring/check-notifications',function( response ){
-            callback(response);
+            callback(filter(response));
         });
     }
 
 // информация о операторе сети
     self.statusNet = function(callback){
         self.info( '/api/net/current-plmn',function( response ){
-            callback(response);
+            callback(filter(response));
         });
     }
 
 // информация кол. сообщений
     self.smsCount = function(callback){
         self.info( '/api/sms/sms-count',function( response ){
-            callback(response);
+            callback(filter(response));
         });
     }
 
 // информация о сигнале сети
     self.signal = function(callback){
         self.info( '/api/device/signal',function( response ){
-            callback(response);
+            callback(filter(response));
         });
     }
 
 // информация о ip сети
     self.settingsNet = function(callback){
         self.info( '/api/dhcp/settings',function( response ){
-            callback(response);
+            callback(filter(response));
         });
     }
 
 // информация о модеме
     self.basicInfo = function (callback) {
         self.info( '/api/device/basic_information',function( response ){
-            callback(response);
+            callback(filter(response));
         });
     }
 
@@ -416,7 +422,21 @@ var hilink = function(){
 
     function formatFloat(src, pos) {
         return Math.round(src * Math.pow(10, pos)) / Math.pow(10, pos);
+    };
+
+
+    function filter(response) {
+        for (var key in response.response) {
+            if (response.response[key][0] != "") {
+                x = response.response[key][0];
+                response.response[key] = x;
+            } else {
+                delete response.response[key];
+            }
     }
+        return response;
+    };
+
 
 
     function getTrafficInfo(bit) {
@@ -444,7 +464,7 @@ var hilink = function(){
             final_str = final_number + ' TB';
         }
         return final_str;
-    }
+    };
 
 
     function getCurrentTime(time) {
@@ -478,7 +498,7 @@ var hilink = function(){
         }
 
         return final_time;
-    }
+    };
 
 // Статистика трафика за месяц
 
@@ -486,12 +506,12 @@ var hilink = function(){
         self.info('/api/monitoring/month_statistics', function (response) {
 
             if (self.trafficInfo == 'auto') {
-                response.response.MonthDuration[0] = getCurrentTime(response.response.MonthDuration[0])
-                response.response.CurrentMonthDownload[0] = getTrafficInfo(response.response.CurrentMonthDownload[0])
-                response.response.CurrentMonthUpload[0] = getTrafficInfo(response.response.CurrentMonthUpload[0])
-            callback(response);
+                response.response.MonthDuration[0] = getCurrentTime(response.response.MonthDuration[0]);
+                response.response.CurrentMonthDownload[0] = getTrafficInfo(response.response.CurrentMonthDownload[0]);
+                response.response.CurrentMonthUpload[0] = getTrafficInfo(response.response.CurrentMonthUpload[0]);
+                callback(filter(response));
             } else {
-                callback(response);
+                callback(filter(response));
             }
         });
     }
@@ -501,17 +521,17 @@ var hilink = function(){
         self.info('/api/monitoring/traffic-statistics', function (response) {
 
             if (self.trafficInfo == 'auto') {
-                response.response.CurrentConnectTime[0] = getCurrentTime(response.response.CurrentConnectTime[0])
-                response.response.TotalConnectTime[0] = getCurrentTime(response.response.TotalConnectTime[0])
-                response.response.CurrentUpload[0] = getTrafficInfo(response.response.CurrentUpload[0])
-                response.response.CurrentDownload[0] = getTrafficInfo(response.response.CurrentDownload[0])
-                response.response.TotalUpload[0] = getTrafficInfo(response.response.TotalUpload[0])
-                response.response.TotalDownload[0] = getTrafficInfo(response.response.TotalDownload[0])
-                response.response.CurrentDownloadRate[0] = getTrafficInfo(response.response.CurrentDownloadRate)
-                response.response.CurrentUploadRate[0] = getTrafficInfo(response.response.CurrentUploadRate[0])
-                callback(response);
+                response.response.CurrentConnectTime[0] = getCurrentTime(response.response.CurrentConnectTime[0]);
+                response.response.TotalConnectTime[0] = getCurrentTime(response.response.TotalConnectTime[0]);
+                response.response.CurrentUpload[0] = getTrafficInfo(response.response.CurrentUpload[0]);
+                response.response.CurrentDownload[0] = getTrafficInfo(response.response.CurrentDownload[0]);
+                response.response.TotalUpload[0] = getTrafficInfo(response.response.TotalUpload[0]);
+                response.response.TotalDownload[0] = getTrafficInfo(response.response.TotalDownload[0]);
+                response.response.CurrentDownloadRate[0] = getTrafficInfo(response.response.CurrentDownloadRate);
+                response.response.CurrentUploadRate[0] = getTrafficInfo(response.response.CurrentUploadRate[0]);
+                callback(filter(response));
             } else {
-                callback(response);
+                callback(filter(response));
             }
         });
     }
@@ -589,14 +609,13 @@ var hilink = function(){
             if (response.response == 'OK') {
                 function func() {
                     self.info('/api/ussd/get', function (response) {
-                        response.response.response = 'OK'
-                        callback(response);
+                        callback(filter(response));
                     });
                 }
 
-                setTimeout(func, 5000);
+                setTimeout(func, 3500);
             } else {
-                callback(response);
+                callback(filter(response));
             }
 
         });
