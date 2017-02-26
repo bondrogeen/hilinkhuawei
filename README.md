@@ -11,6 +11,8 @@ $ npm install hilinkhuawei
 
 * Совместимость
 E3372 (МТС 827F/829F, МегаФон M150-2, Билайн E3372/E3370, TELE2 E3372р-153
+
+Github : https://github.com/bondrogeen/hilinkhuawei
 	
 * Include
 
