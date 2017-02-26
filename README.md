@@ -6,6 +6,8 @@
 
 $ npm install hilinkhuawei
 
+[![NPM version](http://img.shields.io/npm/v/hilinkhuawei.svg)](https://www.npmjs.com/package/hilinkhuawei)
+[![Downloads](https://img.shields.io/npm/dm/hilinkhuawei.svg)](https://www.npmjs.com/package/hilinkhuawei)
 
 * Совместимость
 E3372 (МТС 827F/829F, МегаФон M150-2, Билайн E3372/E3370, TELE2 E3372р-153
