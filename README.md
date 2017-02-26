@@ -1,3 +1,5 @@
+![Logo](api/hilink.png)
+
 Клиент для Huawei модемов с прошивками HiLink
 
 * Установка
