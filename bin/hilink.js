@@ -18,7 +18,7 @@ var hilink = function(){
     self.token = '0000';
 
 
-    self.setTrafficInfo = function (TrafficInfo) {
+    self.setTrafficInfo = function( TrafficInfo ){
         self.trafficInfo = TrafficInfo;
     };
 
@@ -27,63 +27,90 @@ var hilink = function(){
         self.ip = ip;
     }
 
-// Получаем token
-    function getToken( callback) {
+    function cookie(callback) {
+        var val = {};
+        var options = {
+            hostname: self.ip,
+            port: self.port,
+            path: '/html/index.html',
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'Content-Length': Buffer.byteLength("")
+            }
+        };
+        var req = http.request(options, (res) => {
+                if(res.statusCode ===200 && res.headers["set-cookie"][0]){
+            var coo = res.headers["set-cookie"][0].split(';')[0];
+            //console.log(res.headers);
+            val.cookie=coo;
+            //callback (coo)
+            //console.log(coo);
+        }
+        res.setEncoding('utf8');
+        var buffer = "";
+        res.on('data', (chunk) => {
+            buffer = buffer + chunk;
+        });
+        res.on('end', () => {
 
-        http.get('http://'+self.ip+'/api/webserver/token', (res) => {
+            rr = buffer.split("<meta name=\"csrf_token\" content=\"");
+            val.one = rr[1].substring(0,32)
+            val.two = rr[2].substring(0,32)
+        callback(val)
+        //console.log(buffer)
+        })
 
-        var body = [];
-        res.on('data', function (chunk) {
-            body.push(chunk);
-        }).on('end', function() {
-            body = Buffer.concat(body).toString();
-            parseString(body, function (err, result) {
-                var token = result.response.token[0]
-                self.token = token;
-                callback (token);
-            });
-         });
-    res.resume();
-    }).on('error', (e) => {
-            console.log(`error: ${e.message}`);
     });
+        req.on('error', (e) => {
+            callback ("error")
+        console.log(`problem with request: ${e.message}`);
+    });
+        req.write("");
+        req.end();
     }
 
-    self.request = function( path, xml, callback ){       // post запросы модему
 
-        getToken(function( token ){
-            self.token = token;
-            var postRequest = {
-                host: self.ip,
-                path: path,
-                port: self.port,
-                method: "POST",
-                headers: {
-                    'Content-Type' : 'application/x-www-form-urlencoded',
-                    'Cookie': "cookie",
-                    'Content-Type': 'text/xml',
-                    'Content-Length': Buffer.byteLength(xml),
-                    '__RequestVerificationToken':self.token
-                }
-            };
+// Получаем token
 
-            var buffer = "";
+    self.request = function( path, xml, callback ){      // post запросы модему
 
-            var req = http.request( postRequest, function( res )    {
+        cookie(function( date ){
+            self.token = "11111";
+            //console.log(date);
+                var postRequest = {
+                    host: self.ip,
+                    path: path,
+                    port: self.port,
+                    method: "POST",
+                    headers: {
+                        'Content-Type' : 'application/x-www-form-urlencoded',
+                        'Cookie': date.cookie,
+                        'Content-Type': 'text/xml',
+                        'Content-Length': Buffer.byteLength(xml),
+                        '__RequestVerificationToken':date.one
+                    }
+                };
+
                 var buffer = "";
-                res.on( "data", function( data ) {
-                    buffer = buffer + data;
-                });
-                res.on( "end", function( data ) {
-                    parseString( buffer, function (err, result) {
-                        callback( result );
+
+                var req = http.request( postRequest, function( res )    {
+                    var buffer = "";
+                    res.on( "data", function( data ) {
+                        buffer = buffer + data;
+                    });
+                    res.on( "end", function( data ) {
+                        //console.log(buffer)
+                        parseString( buffer, function (err, result) {
+                            callback( result );
+                        });
                     });
                 });
+
+                req.write( xml );
+                req.end();
             });
 
-            req.write( xml );
-            req.end();
-        } );
 
     }
 
@@ -123,7 +150,7 @@ var hilink = function(){
 
     };
 
-    self.setRead = function (index, callback) {
+    self.setRead = function( index, callback ){
         var xml = builder.create({
             request: {
                 Index: {
@@ -131,32 +158,31 @@ var hilink = function(){
                 }
 
             }
-        }).end({pretty: true});
+        }).end({ pretty: true});
 
-        self.request('/api/sms/set-read', xml, function (response) {
-            callback(response);
+        self.request( '/api/sms/set-read', xml, function( response ){
+            callback( response );
         });
     };
 
-    self.readAll = function (callback) {
-        self.list(1, function (results) {
+    self.readAll = function(callback) {
+        self.list( 1, function(results) {
             var response = {};
             var key = 0;
-            var index = [];
+            var index=[];
             for (i = 0; i < results.response.Count[0]; i++) {
-                if (results.response.Messages[0].Message[i].Smstat[0] == 0) {
+                if(results.response.Messages[0].Message[i].Smstat[0]==0){
                     self.setRead(results.response.Messages[0].Message[i].Index[0], function (res) {
                     });
                     index[key] = results.response.Messages[0].Message[i].Index[0];
                     response.response = index
-                    key = key + 1;
+                    key=key+1;
                     response.Count = key
-                }
-                ;
+                };
             }
 
-            if (index.length == 0) {
-                response = {"response": "no_new_sms"};
+            if (index.length == 0){
+                response = {"response":"no_new_sms"};
             }
             callback(response);
         });
@@ -194,27 +220,29 @@ var hilink = function(){
     }
 
 
-    self.listNew = function (callback) {
-        self.list(1, function (response) {
+    self.listNew = function(callback){
+        console.log("11111")
+        self.list( 1, function(response) {
+            console.log(response)
             response = listfilter(response);
             var k = 0;
-            var Messages = [];
+            var Messages=[];
             for (var i = 0; i < response.Count; i++) {
-                if (response.response[i].Smstat == 0) {
+                if(response.response[i].Smstat == 0){
                     Messages[k] = response.response[i];
                     k = k + 1;
                 }
             }
             response.response = Messages
             response.Count = k
-            if (Messages.length == 0) {
-                response = {"response": "no_new_sms"};
+            if (Messages.length == 0){
+                response = {"response":"no_new_sms"};
             }
             callback(response);
         });
     }
 
-    function listfilter(response) {
+    function listfilter(response){
 
         Count = response.response.Count[0];
         response.response = response.response.Messages[0].Message
@@ -239,6 +267,7 @@ var hilink = function(){
 
     self.listOutbox = function(callback){
         self.list( 2,function( response ){
+
             callback(listfilter(response));
         });
     }
@@ -300,77 +329,102 @@ var hilink = function(){
 
 // get запросы модему
     self.info = function(val, callback) {
-        http.get('http://'+self.ip+val, (res) => {
-            //console.log(`Got response: ${res.statusCode}`);
+
+
+        cookie(function( data ){
+            var options = {
+                hostname: self.ip,
+                port: 80,
+                path: val,
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'Content-Length': Buffer.byteLength(""),
+                    'Cookie': data.cookie
+                }
+            };
+            var req = http.request(options, (res) => {
+                    console.log(`STATUS: ${res.statusCode}`);
+            res.setEncoding('utf8');
             var buffer = "";
-        res.on('data', function (data) {
-            buffer = buffer + data;
-        }).on('end', function(data) {
-            parseString( buffer, function (err, result) {
-                callback( result );
-            });
+            res.on('data', (chunk) => {
+                buffer = buffer + chunk;
         });
-        res.resume();
-    }).on('error', (e) => {
-            console.log(`Got error: ${e.message}`);
-    });
+            res.on('end', () => {
+                parseString( buffer, function (err, result) {
+                    callback( result );
+                });
+            //console.log(buffer)
+        })
+        });
+            req.on('error', (e) => {
+                console.log("error")
+            console.log(`problem with request: ${e.message}`);
+        });
+
+            req.write("");
+            req.end();
+
+        })
+
+
     }
 
 
     self.jsonNet = {
-        "0": "NOSERVICE",
-        "1": "GSM",
-        "2": "GPRS",
-        "3": "EDGE",
-        "21": "IS95A",
-        "22": "IS95B",
-        "23": "CDMA1x",
-        "24": "EVDO_REV_0",
-        "25": "EVDO_REV_A",
-        "26": "EVDO_REV_A",
-        "27": "HYBRID_CDMA1x",
-        "28": "HYBRID_EVDO_REV_0",
-        "29": "HYBRID_EVDO_REV_A",
-        "30": "HYBRID_EVDO_REV_A",
-        "31": "EHRPD_Rel_0",
-        "32": "EHRPD_Rel_A",
-        "33": "EHRPD_Rel_B",
-        "34": "HYBRID_EHRPD_Rel_0",
-        "35": "HYBRID_EHRPD_Rel_A",
-        "36": "HYBRID_EHRPD_Rel_B",
-        "41": "WCDMA",
-        "42": "HSDPA",
-        "43": "HSUPA",
-        "44": "HSPA",
-        "45": "HSPA_PLUS",
-        "46": "DC_HSPA_PLUS",
-        "61": "TD_SCDMA",
-        "62": "TD_HSDPA",
-        "63": "TD_HSUPA",
-        "64": "TD_HSPA",
-        "65": "TD_HSPA_PLUS",
-        "81": "802.16E",
-        "101": "LTE"
+        "0":"NOSERVICE",
+        "1":"GSM",
+        "2":"GPRS",
+        "3":"EDGE",
+        "21":"IS95A",
+        "22":"IS95B",
+        "23":"CDMA1x",
+        "24":"EVDO_REV_0",
+        "25":"EVDO_REV_A",
+        "26":"EVDO_REV_A",
+        "27":"HYBRID_CDMA1x",
+        "28":"HYBRID_EVDO_REV_0",
+        "29":"HYBRID_EVDO_REV_A",
+        "30":"HYBRID_EVDO_REV_A",
+        "31":"EHRPD_Rel_0",
+        "32":"EHRPD_Rel_A",
+        "33":"EHRPD_Rel_B",
+        "34":"HYBRID_EHRPD_Rel_0",
+        "35":"HYBRID_EHRPD_Rel_A",
+        "36":"HYBRID_EHRPD_Rel_B",
+        "41":"WCDMA",
+        "42":"HSDPA",
+        "43":"HSUPA",
+        "44":"HSPA",
+        "45":"HSPA_PLUS",
+        "46":"DC_HSPA_PLUS",
+        "61":"TD_SCDMA",
+        "62":"TD_HSDPA",
+        "63":"TD_HSUPA",
+        "64":"TD_HSPA",
+        "65":"TD_HSPA_PLUS",
+        "81":"802.16E",
+        "101":"LTE"
     };
-    self.jsonNetStatsu = {
-        "900": "CONNECTING",
-        "901": "CONNECTED",
-        "902": "DISCONNECTING",
-        "904": "DISCONNECTED"
+    self.jsonNetStatsu =   {
+        "900":"CONNECTING",
+        "901":"CONNECTED",
+        "902":"DISCONNECTING",
+        "904":"DISCONNECTED"
     };
 
 
 // информация общая о модеме
 
     self.status = function(callback){
-        self.info('/api/monitoring/status', function (response) {
+        self.info ('/api/monitoring/status',function( response ){
             self.jsonNet[response.response.CurrentNetworkType[0]] = self.jsonNet[response.response.CurrentNetworkType[0]] || response.response.CurrentNetworkType[0]
             response.response.CurrentNetworkType[0] = self.jsonNet[response.response.CurrentNetworkType[0]]
             self.jsonNetStatsu[response.response.ConnectionStatus[0]] = self.jsonNetStatsu[response.response.ConnectionStatus[0]] || response.response.ConnectionStatus[0]
             response.response.ConnectionStatus[0] = self.jsonNetStatsu[response.response.ConnectionStatus[0]]
             self.jsonNet[response.response.CurrentNetworkTypeEx[0]] = self.jsonNet[response.response.CurrentNetworkTypeEx[0]] || response.response.CurrentNetworkTypeEx[0]
             response.response.CurrentNetworkTypeEx[0] = self.jsonNet[response.response.CurrentNetworkTypeEx[0]]
-            callback(filter(response));
+            callback(filter (response));
         });
 
     }
@@ -378,42 +432,42 @@ var hilink = function(){
 // информация о уведомлениях  сети
     self.notifications = function(callback){
         self.info( '/api/monitoring/check-notifications',function( response ){
-            callback(filter(response));
+            callback(filter (response));
         });
     }
 
 // информация о операторе сети
     self.statusNet = function(callback){
         self.info( '/api/net/current-plmn',function( response ){
-            callback(filter(response));
+            callback(filter (response));
         });
     }
 
 // информация кол. сообщений
     self.smsCount = function(callback){
         self.info( '/api/sms/sms-count',function( response ){
-            callback(filter(response));
+            callback(filter (response));
         });
     }
 
 // информация о сигнале сети
     self.signal = function(callback){
         self.info( '/api/device/signal',function( response ){
-            callback(filter(response));
+            callback(filter (response));
         });
     }
 
 // информация о ip сети
     self.settingsNet = function(callback){
         self.info( '/api/dhcp/settings',function( response ){
-            callback(filter(response));
+            callback(filter (response));
         });
     }
 
 // информация о модеме
-    self.basicInfo = function (callback) {
+    self.basicInfo = function(callback){
         self.info( '/api/device/basic_information',function( response ){
-            callback(filter(response));
+            callback(filter (response));
         });
     }
 
@@ -425,15 +479,15 @@ var hilink = function(){
     };
 
 
-    function filter(response) {
+    function filter(response){
         for (var key in response.response) {
-            if (response.response[key][0] != "") {
+            if (response.response[key][0]!=""){
                 x = response.response[key][0];
                 response.response[key] = x;
-            } else {
+            }else{
                 delete response.response[key];
             }
-    }
+        }
         return response;
     };
 
@@ -502,25 +556,25 @@ var hilink = function(){
 
 // Статистика трафика за месяц
 
-    self.trafficMonth = function (callback) {
-        self.info('/api/monitoring/month_statistics', function (response) {
+    self.trafficMonth = function(callback){
+        self.info( '/api/monitoring/month_statistics',function( response ){
 
-            if (self.trafficInfo == 'auto') {
+            if (self.trafficInfo== 'auto') {
                 response.response.MonthDuration[0] = getCurrentTime(response.response.MonthDuration[0]);
                 response.response.CurrentMonthDownload[0] = getTrafficInfo(response.response.CurrentMonthDownload[0]);
                 response.response.CurrentMonthUpload[0] = getTrafficInfo(response.response.CurrentMonthUpload[0]);
-                callback(filter(response));
-            } else {
-                callback(filter(response));
+                callback(filter (response));
+            }else{
+                callback(filter (response));
             }
         });
     }
 
 // Статистика трафика модема
-    self.traffic = function (callback) {
-        self.info('/api/monitoring/traffic-statistics', function (response) {
+    self.traffic = function(callback){
+        self.info( '/api/monitoring/traffic-statistics',function( response ){
 
-            if (self.trafficInfo == 'auto') {
+            if (self.trafficInfo== 'auto') {
                 response.response.CurrentConnectTime[0] = getCurrentTime(response.response.CurrentConnectTime[0]);
                 response.response.TotalConnectTime[0] = getCurrentTime(response.response.TotalConnectTime[0]);
                 response.response.CurrentUpload[0] = getTrafficInfo(response.response.CurrentUpload[0]);
@@ -529,58 +583,60 @@ var hilink = function(){
                 response.response.TotalDownload[0] = getTrafficInfo(response.response.TotalDownload[0]);
                 response.response.CurrentDownloadRate[0] = getTrafficInfo(response.response.CurrentDownloadRate);
                 response.response.CurrentUploadRate[0] = getTrafficInfo(response.response.CurrentUploadRate[0]);
-                callback(filter(response));
-            } else {
-                callback(filter(response));
+                callback(filter (response));
+            }else{
+                callback(filter (response));
             }
         });
     }
 
 
-    self.control = function (value, callback) {
+
+
+    self.control  = function(value,callback){
 
         // перезугрузка модема
-        if (value == 'reboot') {
+        if (value == 'reboot'){
             var xml = builder.create({
                 request: {
                     Control: {
                         '#text': 1
                     },
                 }
-            }).end({pretty: true});
+            }).end({ pretty: true});
 
-            self.request('/api/device/control', xml, function (response) {
-                callback(response);
+            self.request( '/api/device/control', xml, function( response ){
+                callback( response );
             });
 
             // вкл. и откл. от мобильной сети.
-        } else if (value == 'conect') {
+        }else if (value=='conect'){
             var xml = builder.create({
                 request: {
                     Action: {
                         '#text': 1
                     },
                 }
-            }).end({pretty: true});
+            }).end({ pretty: true});
 
-            self.request('/api/dialup/dial', xml, function (response) {
-                callback(response);
+            self.request( '/api/dialup/dial', xml, function( response ){
+                callback( response );
             });
 
-        } else if (value == 'desconect') {
+        }else if (value=='desconect'){
             var xml = builder.create({
                 request: {
                     Action: {
                         '#text': 0
                     },
                 }
-            }).end({pretty: true});
+            }).end({ pretty: true});
 
-            self.request('/api/dialup/dial', xml, function (response) {
-                callback(response);
+            self.request( '/api/dialup/dial', xml, function( response ){
+                callback( response );
             });
-        } else {
-            callback(response = {"response": "ERROR"});
+        }else {
+            callback( response = {"response":"ERROR"});
         }
 
 
@@ -609,13 +665,13 @@ var hilink = function(){
             if (response.response == 'OK') {
                 function func() {
                     self.info('/api/ussd/get', function (response) {
-                        callback(filter(response));
+                        callback(filter (response));
                     });
                 }
 
                 setTimeout(func, 3500);
-            } else {
-                callback(filter(response));
+            }else{
+                callback(filter (response));
             }
 
         });
