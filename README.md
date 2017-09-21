@@ -460,6 +460,10 @@ hilink.control('conect',function(response ){
 
    Changelog
    
+   2.1.0
+   
+Добавил 3372H   
+   
    2.0.0
    
 Изменил ответ
