@@ -2,6 +2,13 @@
 
 Клиент для Huawei модемов с прошивками HiLink
 
+Проверенно на модемах:
+E3372h-153_Update_22.323.01.00.143_M_AT_05.10
+E3372s Update_22.286.53.01.161_S_ADB_TLN_03
+
+Прошивки и другую информацию можно найти тут - http://4pda.ru/forum/index.php?showtopic=582284&
+
+
 * Установка
 
 $ npm install hilinkhuawei
@@ -30,6 +37,14 @@ E3372 (МТС 827F/829F, МегаФон M150-2, Билайн E3372/E3370, TELE2 
     'def'  - по умолчанию трафик в битах, время в сек.
     
     hilink.setTrafficInfo('def')
+    
+* Изменить версии модема   (default - '3372s')  
+
+    Прошивки hilink разной версии имеют разную аутентификацию:
+    '3372s' - по token
+    '3372h' - по token и cookie
+    
+    hilink.setModel('3372s')
 
 * Отправка ussd ( *100#, callback )
 
