@@ -17,6 +17,11 @@ var hilink = function(){
 
     self.token = '0000';
 
+    self.model = "3372h"
+
+    self.setModel = function( model ){
+        self.model = model;
+    };
 
     self.setTrafficInfo = function( TrafficInfo ){
         self.trafficInfo = TrafficInfo;
@@ -25,6 +30,27 @@ var hilink = function(){
 //изменения ip
     self.setIp = function( ip ){
         self.ip = ip;
+    }
+
+    function getToken( callback) {
+
+        http.get('http://'+self.ip+'/api/webserver/token', (res) => {
+
+            var body = [];
+        res.on('data', function (chunk) {
+            body.push(chunk);
+        }).on('end', function() {
+            body = Buffer.concat(body).toString();
+            parseString(body, function (err, result) {
+                var token = result.response.token[0]
+                self.token = token;
+                callback (token);
+            });
+        });
+        res.resume();
+    }).on('error', (e) => {
+            console.log(`error: ${e.message}`);
+    });
     }
 
     function cookie(callback) {
@@ -75,9 +101,11 @@ var hilink = function(){
 
     self.request = function( path, xml, callback ){      // post запросы модему
 
-        cookie(function( date ){
-            self.token = "11111";
-            //console.log(date);
+        if(self.model === "3372h"){
+
+            cookie(function( date ){
+                self.token = "11111";
+                //console.log(date);
                 var postRequest = {
                     host: self.ip,
                     path: path,
@@ -110,6 +138,47 @@ var hilink = function(){
                 req.write( xml );
                 req.end();
             });
+
+
+
+
+        }else if(self.model === "3372s" ){
+
+            getToken(function( token ){
+                self.token = token;
+                var postRequest = {
+                    host: self.ip,
+                    path: path,
+                    port: self.port,
+                    method: "POST",
+                    headers: {
+                        'Content-Type' : 'application/x-www-form-urlencoded',
+                        'Cookie': "cookie",
+                        'Content-Type': 'text/xml',
+                        'Content-Length': Buffer.byteLength(xml),
+                        '__RequestVerificationToken':self.token
+                    }
+                };
+
+                var buffer = "";
+
+                var req = http.request( postRequest, function( res )    {
+                    var buffer = "";
+                    res.on( "data", function( data ) {
+                        buffer = buffer + data;
+                    });
+                    res.on( "end", function( data ) {
+                        parseString( buffer, function (err, result) {
+                            callback( result );
+                        });
+                    });
+                });
+
+                req.write( xml );
+                req.end();
+            } );
+
+        }
 
 
     }
@@ -330,43 +399,64 @@ var hilink = function(){
 // get запросы модему
     self.info = function(val, callback) {
 
+        if(self.model === "3372h"){
 
-        cookie(function( data ){
-            var options = {
-                hostname: self.ip,
-                port: 80,
-                path: val,
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'Content-Length': Buffer.byteLength(""),
-                    'Cookie': data.cookie
-                }
-            };
-            var req = http.request(options, (res) => {
-                    console.log(`STATUS: ${res.statusCode}`);
-            res.setEncoding('utf8');
-            var buffer = "";
-            res.on('data', (chunk) => {
-                buffer = buffer + chunk;
-        });
-            res.on('end', () => {
+            cookie(function( data ){
+                var options = {
+                    hostname: self.ip,
+                    port: 80,
+                    path: val,
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'Content-Length': Buffer.byteLength(""),
+                        'Cookie': data.cookie
+                    }
+                };
+                var req = http.request(options, (res) => {
+                        console.log(`STATUS: ${res.statusCode}`);
+                res.setEncoding('utf8');
+                var buffer = "";
+                res.on('data', (chunk) => {
+                    buffer = buffer + chunk;
+            });
+                res.on('end', () => {
+                    parseString( buffer, function (err, result) {
+                        callback( result );
+                    });
+                //console.log(buffer)
+            })
+            });
+                req.on('error', (e) => {
+                    console.log("error")
+                console.log(`problem with request: ${e.message}`);
+            });
+
+                req.write("");
+                req.end();
+
+            })
+
+
+
+        }else if(self.model === "3372s" ){
+
+            http.get('http://'+self.ip+val, (res) => {
+                //console.log(`Got response: ${res.statusCode}`);
+                var buffer = "";
+            res.on('data', function (data) {
+                buffer = buffer + data;
+            }).on('end', function(data) {
                 parseString( buffer, function (err, result) {
                     callback( result );
                 });
-            //console.log(buffer)
-        })
-        });
-            req.on('error', (e) => {
-                console.log("error")
-            console.log(`problem with request: ${e.message}`);
+            });
+            res.resume();
+        }).on('error', (e) => {
+                console.log(`Got error: ${e.message}`);
         });
 
-            req.write("");
-            req.end();
-
-        })
-
+        }
 
     }
 
@@ -655,13 +745,13 @@ var hilink = function(){
                 },
                 codeType: {
                     '#text' : 'CodeType'
-                },
+                }
 
             }
         }).end({ pretty: true});
 
         self.request( '/api/ussd/send', xml, function( response ){
-
+            console.log(response)
             if (response.response == 'OK') {
                 function func() {
                     self.info('/api/ussd/get', function (response) {
@@ -669,7 +759,7 @@ var hilink = function(){
                     });
                 }
 
-                setTimeout(func, 3500);
+                setTimeout(func, 10000);
             }else{
                 callback(filter (response));
             }
