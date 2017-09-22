@@ -34,23 +34,39 @@ var hilink = function(){
 
     function getToken( callback) {
 
-        http.get('http://'+self.ip+'/api/webserver/token', (res) => {
-
-            var body = [];
-        res.on('data', function (chunk) {
-            body.push(chunk);
-        }).on('end', function() {
-            body = Buffer.concat(body).toString();
-            parseString(body, function (err, result) {
-                var token = result.response.token[0]
-                self.token = token;
-                callback (token);
-            });
+        var options = {
+            hostname: self.ip,
+            port: self.port,
+            path: '/api/webserver/token',
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'Content-Length': Buffer.byteLength("")
+            }
+        };
+        var req = http.request(options, (res) => {
+                console.log(`STATUS: ${res.statusCode}`);
+                console.log(`HEADERS: ${res.headers["set-cookie"]}`);
+                res.setEncoding('utf8');
+                var buffer = "";
+                res.on('data', (chunk) => {
+                    buffer = buffer + chunk;
+                });
+                res.on('end', () => {
+                    parseString(buffer, function (err, result) {
+                        var token = result.response.token[0]
+                        self.token = token;
+                        callback (token);
+                        });
+                 console.log(buffer)
+                 })
         });
-        res.resume();
-    }).on('error', (e) => {
-            console.log(`error: ${e.message}`);
-    });
+        req.on('error', (e) => {
+            console.log("error")
+            console.log('problem with request: ' + e.message);
+        });
+        req.write("");
+        req.end();
     }
 
     function cookie(callback) {
