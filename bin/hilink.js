@@ -33,7 +33,6 @@ var hilink = function(){
     }
 
     function getToken( callback) {
-
         var options = {
             hostname: self.ip,
             port: self.port,
@@ -45,8 +44,6 @@ var hilink = function(){
             }
         };
         var req = http.request(options, (res) => {
-                console.log(`STATUS: ${res.statusCode}`);
-                console.log(`HEADERS: ${res.headers["set-cookie"]}`);
                 res.setEncoding('utf8');
                 var buffer = "";
                 res.on('data', (chunk) => {
