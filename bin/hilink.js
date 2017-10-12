@@ -17,7 +17,7 @@ var hilink = function(){
 
     self.token = '0000';
 
-    self.model = "3372h"
+    self.model = "3372s"
 
     self.setModel = function( model ){
         self.model = model;
@@ -33,6 +33,7 @@ var hilink = function(){
     }
 
     function getToken( callback) {
+
         var options = {
             hostname: self.ip,
             port: self.port,
@@ -44,19 +45,21 @@ var hilink = function(){
             }
         };
         var req = http.request(options, (res) => {
-                res.setEncoding('utf8');
-                var buffer = "";
-                res.on('data', (chunk) => {
-                    buffer = buffer + chunk;
+            console.log(`STATUS: ${res.statusCode}`);
+            console.log(`HEADERS: ${res.headers["set-cookie"]}`);
+            res.setEncoding('utf8');
+            var buffer = "";
+            res.on('data', (chunk) => {
+                buffer = buffer + chunk;
+            });
+            res.on('end', () => {
+                parseString(buffer, function (err, result) {
+                    var token = result.response.token[0]
+                    self.token = token;
+                    callback (token);
                 });
-                res.on('end', () => {
-                    parseString(buffer, function (err, result) {
-                        var token = result.response.token[0]
-                        self.token = token;
-                        callback (token);
-                        });
-                 console.log(buffer)
-                 })
+                console.log(buffer)
+            })
         });
         req.on('error', (e) => {
             console.log("error")
@@ -79,32 +82,32 @@ var hilink = function(){
             }
         };
         var req = http.request(options, (res) => {
-                if(res.statusCode ===200 && res.headers["set-cookie"][0]){
-            var coo = res.headers["set-cookie"][0].split(';')[0];
-            //console.log(res.headers);
-            val.cookie=coo;
-            //callback (coo)
-            //console.log(coo);
-        }
-        res.setEncoding('utf8');
-        var buffer = "";
-        res.on('data', (chunk) => {
-            buffer = buffer + chunk;
+            if(res.statusCode ===200 && res.headers["set-cookie"][0]){
+                var coo = res.headers["set-cookie"][0].split(';')[0];
+                //console.log(res.headers);
+                val.cookie=coo;
+                //callback (coo)
+                //console.log(coo);
+            }
+            res.setEncoding('utf8');
+            var buffer = "";
+            res.on('data', (chunk) => {
+                buffer = buffer + chunk;
+            });
+            res.on('end', () => {
+
+                rr = buffer.split("<meta name=\"csrf_token\" content=\"");
+                val.one = rr[1].substring(0,32)
+                val.two = rr[2].substring(0,32)
+                callback(val)
+                //console.log(buffer)
+            })
+
         });
-        res.on('end', () => {
-
-            rr = buffer.split("<meta name=\"csrf_token\" content=\"");
-            val.one = rr[1].substring(0,32)
-            val.two = rr[2].substring(0,32)
-        callback(val)
-        //console.log(buffer)
-        })
-
-    });
         req.on('error', (e) => {
             callback ("error")
-        console.log(`problem with request: ${e.message}`);
-    });
+            console.log(`problem with request: ${e.message}`);
+        });
         req.write("");
         req.end();
     }
@@ -427,23 +430,23 @@ var hilink = function(){
                     }
                 };
                 var req = http.request(options, (res) => {
-                        console.log(`STATUS: ${res.statusCode}`);
-                res.setEncoding('utf8');
-                var buffer = "";
-                res.on('data', (chunk) => {
-                    buffer = buffer + chunk;
-            });
-                res.on('end', () => {
-                    parseString( buffer, function (err, result) {
-                        callback( result );
+                    console.log(`STATUS: ${res.statusCode}`);
+                    res.setEncoding('utf8');
+                    var buffer = "";
+                    res.on('data', (chunk) => {
+                        buffer = buffer + chunk;
                     });
-                //console.log(buffer)
-            })
-            });
+                    res.on('end', () => {
+                        parseString( buffer, function (err, result) {
+                            callback( result );
+                        });
+                        //console.log(buffer)
+                    })
+                });
                 req.on('error', (e) => {
                     console.log("error")
-                console.log(`problem with request: ${e.message}`);
-            });
+                    console.log(`problem with request: ${e.message}`);
+                });
 
                 req.write("");
                 req.end();
@@ -457,17 +460,17 @@ var hilink = function(){
             http.get('http://'+self.ip+val, (res) => {
                 //console.log(`Got response: ${res.statusCode}`);
                 var buffer = "";
-            res.on('data', function (data) {
-                buffer = buffer + data;
-            }).on('end', function(data) {
-                parseString( buffer, function (err, result) {
-                    callback( result );
+                res.on('data', function (data) {
+                    buffer = buffer + data;
+                }).on('end', function(data) {
+                    parseString( buffer, function (err, result) {
+                        callback( result );
+                    });
                 });
-            });
-            res.resume();
-        }).on('error', (e) => {
+                res.resume();
+            }).on('error', (e) => {
                 console.log(`Got error: ${e.message}`);
-        });
+            });
 
         }
 
@@ -765,14 +768,28 @@ var hilink = function(){
 
         self.request( '/api/ussd/send', xml, function( response ){
             console.log(response)
+            var wait_time = 0;
             if (response.response == 'OK') {
                 function func() {
                     self.info('/api/ussd/get', function (response) {
-                        callback(filter (response));
+                        console.log(response)
+                        if(response.error){
+                            if(wait_time>30){
+                                callback(filter (response));
+                            }else{
+                                setTimeout(func, 1000);
+                                wait_time = wait_time + 1;
+                                //console.log(wait_time)
+                            }
+
+                        }else{
+                            callback(filter (response));
+                        }
+
                     });
                 }
 
-                setTimeout(func, 10000);
+                setTimeout(func, 1000);
             }else{
                 callback(filter (response));
             }

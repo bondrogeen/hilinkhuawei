@@ -458,8 +458,12 @@ hilink.control('conect',function(response ){
 }
 
 
-   Changelog    
+   Changelog 
+      
+   2.1.3   
    
+fix ussd  
+     
    2.1.1   
    
 Добавил 3372H   

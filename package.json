@@ -1,6 +1,6 @@
 {
   "name": "hilinkhuawei",
-  "version": "2.0.0",
+  "version": "2.1.3",
   "description": "Client for modems with firmware HiLink",
   "main": "index.js",
   "keywords": [
