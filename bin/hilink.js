@@ -281,7 +281,7 @@ var hilink = function(){
                     '#text': '1'
                 },
                 ReadCount: {
-                    '#text': '20'
+                    '#text': '50'
                 },
                 BoxType: {
                     '#text': type
@@ -305,9 +305,53 @@ var hilink = function(){
     }
 
 
+    self.page = function(page, callback){
+        var xml = builder.create({
+            request: {
+
+                PageIndex: {
+                    '#text': page
+                },
+                ReadCount: {
+                    '#text': '20'
+                },
+                BoxType: {
+                    '#text': '1'
+                },
+                SortType: {
+                    '#text': '2'
+                },
+                Ascending: {
+                    '#text': '0'
+                },
+                UnreadPreferred: {
+                    '#text': '1'
+                }
+
+            }
+        }).end({ pretty: true});
+
+        self.request( '/api/sms/sms-list', xml, function( response ){
+            callback( response );
+        });
+    }
+
+    function listfilter(response){
+        Count = response.response.Count[0];
+        response.response = response.response.Messages[0].Message
+        for (var i = 0; i < Count; i++) {
+            for (var key in response.response[i]) {
+                x = response.response[i][key][0];
+                response.response[i][key] = x;
+            }
+        }
+        response.Count = Count;
+        //console.log(response);
+        return response;
+    };
+
     self.listNew = function(callback){
-        console.log("11111")
-        self.list( 1, function(response) {
+        self.page( 1, function(response) {
             console.log(response)
             response = listfilter(response);
             var k = 0;
@@ -326,23 +370,6 @@ var hilink = function(){
             callback(response);
         });
     }
-
-    function listfilter(response){
-
-        Count = response.response.Count[0];
-        response.response = response.response.Messages[0].Message
-        for (var i = 0; i < Count; i++) {
-            for (var key in response.response[i]) {
-                x = response.response[i][key][0];
-                response.response[i][key] = x;
-            }
-        }
-        response.Count = Count;
-        //console.log(response);
-        return response;
-
-    };
-
 
     self.listInbox = function(callback){
         self.list( 1,function( response ){
