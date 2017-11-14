@@ -1,6 +1,6 @@
 //var hilink = require('hilinkhuawei');
 //
 //
-//hilink.status(function (response) {
+//hilink.listNew(function (response) {
 //    console.log(JSON.stringify(response, null, 2));
 //});

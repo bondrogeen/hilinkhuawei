@@ -313,7 +313,7 @@ var hilink = function(){
                     '#text': page
                 },
                 ReadCount: {
-                    '#text': '20'
+                    '#text': '50'
                 },
                 BoxType: {
                     '#text': '1'
