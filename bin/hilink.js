@@ -743,7 +743,7 @@ var hilink = function(){
             });
 
             // вкл. и откл. от мобильной сети.
-        }else if (value=='conect'){
+        }else if (value=='connect'){
             var xml = builder.create({
                 request: {
                     Action: {
@@ -756,7 +756,7 @@ var hilink = function(){
                 callback( response );
             });
 
-        }else if (value=='desconect'){
+        }else if (value=='disconnect'){
             var xml = builder.create({
                 request: {
                     Action: {

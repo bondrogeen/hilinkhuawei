@@ -82,8 +82,8 @@ E3372 (МТС 827F/829F, МегаФон M150-2, Билайн E3372/E3370, TELE2 
 	{ response: 'OK' }  
 	{ response: 'OK' }  
 
-* Подключиться к сети ('conect',callback)   
-* Отключиться от сети ('desconect',callback)   
+* Подключиться к сети ('connect',callback)   
+* Отключиться от сети ('disconnect',callback)   
 * Перезагрузка модема ('reboot',callback)   
 
 hilink.control('conect',function(response ){   
